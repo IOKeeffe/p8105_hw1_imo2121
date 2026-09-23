@@ -7,5 +7,47 @@ output: github_document
 
 ```{r setup}
 library(tidyverse)
+data("penguins", package = "palmerpenguins")
+```
+Investigate the data properties
+```{r}
+head(penguins)
+num_rows = nrow(penguins)
+num_cols = ncol(penguins)
+mean_bill_length <- round(mean(pull(penguins, bill_length_mm), na.rm = TRUE), 2)
 ```
 
+The data is a collection of `r num_cols` variables across `r num_rows` observed penguins. The variables include the species, island, bill length in mm, bill depth in mm, flipper length in mm, body mass in grams, sex, and year observed. The average bill length is `r mean_bill_length` mm.
+
+
+Here is a scatter plot of flipper length vs bill length.
+```{r plot}
+
+ggplot((penguins), aes(x=bill_length_mm, y = flipper_length_mm, color=species)) + geom_point() + labs(x = "Bill Length (mm)", y = "Flipper Length (mm)")
+
+```
+
+
+Create a dataframe consisting of a random sample of numbers, a logical vector, a character vector, and a factor vector.
+```{r}
+sample = rnorm(10)
+log_vector = sample > 0
+char_vector = c("a", "b", "c", "d", "e", "f", "g", "h", "i", "j")
+factor_vector = factor(rep(c("Small", "Medium", "Large"), length.out = 10))
+
+df = tibble(random_sample = sample, logical_vector = log_vector, character_vector = char_vector, factor_vector = factor_vector)
+df
+mean(pull(df, random_sample))
+mean(pull(df, logical_vector))
+mean(pull(df, character_vector))
+mean(pull(df, factor_vector))
+```
+
+We are only able to get the means of the random sample and logical vectors. Let's try converting them to numbers:
+
+```{r warning=FALSE, results='hide'}
+as.numeric(pull(df, logical_vector))
+as.numeric(pull(df, character_vector))
+as.numeric(pull(df, factor_vector))
+```
+The logical factor is converted into 1s and 0s, as expected by a logical binary. The character vector throws an error and is coerced into a vector of NAs This makes sense, since there is no intuitive way to turn an arbitrary string into a number. The factor vector is converted into 1s, 2s, and 3s, as their factor categories are assigned. However, since these are categorical abstractions, it does not make sense to use them to find a mean.
